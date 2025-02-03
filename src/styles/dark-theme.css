@@ -1,0 +1,6 @@
+/* Basic dark theme styles */
+body, .dark-theme {
+    background: #121212;
+    color: #ffffff;
+  }
+  

@@ -1,0 +1,6 @@
+/* Basic light theme styles */
+body, .light-theme {
+    background: #ffffff;
+    color: #000000;
+  }
+  

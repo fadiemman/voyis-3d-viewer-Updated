@@ -1,0 +1,21 @@
+/* FileUpload.css */
+.file-upload {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .progress-bar {
+    background-color: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .progress {
+    background-color: #4caf50;
+    height: 20px;
+    color: white;
+    text-align: center;
+    line-height: 20px;
+  }
+  

@@ -1,0 +1,9 @@
+/* Logger.css */
+.logger {
+    padding: 10px;
+    background-color: #e0e0e0;
+    height: 100px;
+    overflow-y: auto;
+    border-top: 1px solid #ccc;
+  }
+  

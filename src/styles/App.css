@@ -1,0 +1,36 @@
+/* Global styles for the app */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .main-content {
+    flex: 1;
+    display: flex;
+  }
+  
+  .left-panel {
+    width: 250px;
+    padding: 10px;
+    background: #f5f5f5;
+  }
+  
+  .center-panel {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .bottom-panel {
+    height: 100px;
+    background: #e0e0e0;
+    padding: 10px;
+  }
+  
+  /* Add further styling as needed */
+  
