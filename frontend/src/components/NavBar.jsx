@@ -3,7 +3,7 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import Sidebar from "./Sidebar";
 import logo from "../assets/voyis-logo.png";
 
-export default function Navbar({ sidebarOpen, setSidebarOpen }) {
+export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload }) {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "light"
   );
@@ -39,7 +39,11 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }) {
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>
       </nav>
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onPointCloudUpload={onPointCloudUpload}
+      />
     </>
   );
 }

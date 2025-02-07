@@ -11,8 +11,15 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100vh; /* So it spans the entire viewport height */
-  width: 100%;   /* Ensure it can fill the screen horizontally */
+  width: 100vw;   /* Ensure it can fill the screen horizontally */
   overflow: hidden; /* so no extra scroll if child is sized properly */
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
 }
 
 /* If you have a top nav, the remaining center area is also flex: */
