@@ -21,7 +21,7 @@ function Sidebar({ isOpen, onClose }) {
                 setIsLoading(false);
             }
         } else {
-            alert("Only PCB and GLS files are allowed!");
+            alert("Only PCD and GLS files are allowed!");
         }
     };
 
@@ -48,7 +48,7 @@ function Sidebar({ isOpen, onClose }) {
                                     Processing...
                                 </>
                             ) : (
-                                "Upload PCB or GLS File"
+                                "Upload PCD or GLS File"
                             )}
                         </div>
                     </label>

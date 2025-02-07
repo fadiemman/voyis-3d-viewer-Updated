@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import FileUpload from '../components/FileUpload';
+//import FileUpload from '../components/FileUpload';
 import ThreeDViewer from '../components/ThreeDViewer';
 import GISViewer from '../components/GISViewer';
 import Logger from '../components/Logger';
@@ -28,27 +28,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       {/* ... other components like Header */}
-      <aside className="left-panel">
-        <FileUpload onPointCloudUpload={handlePointCloudUpload} />
-        {pointCloudMeta && (
-          <div className="metadata">
-            <p>Number of Points: {pointCloudMeta.numPoints}</p>
-            <p>
-              Bounding Box: X[{pointCloudMeta.boundingBox.minX.toFixed(2)} ,
-              {pointCloudMeta.boundingBox.maxX.toFixed(2)}], Y[
-              {pointCloudMeta.boundingBox.minY.toFixed(2)} ,
-              {pointCloudMeta.boundingBox.maxY.toFixed(2)}], Z[
-              {pointCloudMeta.boundingBox.minZ.toFixed(2)} ,
-              {pointCloudMeta.boundingBox.maxZ.toFixed(2)}]
-            </p>
-          </div>
-        )}
-      </aside>
       <section className="center-panel">
-        <div className="tab-navigation">
-          <button onClick={() => setActiveTab('3d')}>3D Viewer</button>
-          <button onClick={() => setActiveTab('gis')}>GIS Map</button>
-        </div>
         {activeTab === '3d' ? (
           <ThreeDViewer pointCloudData={pointCloudData} />
         ) : (

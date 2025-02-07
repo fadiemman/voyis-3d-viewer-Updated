@@ -110,7 +110,7 @@ const ThreeDViewer = ({ pointCloudData }) => {
       overlay.style.color = 'white';
       overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
       overlay.style.padding = '5px';
-      overlay.innerHTML = 'Demo Data Loaded (No file uploaded)';
+      overlay.innerHTML = 'Demo Data Loaded';
       mountRef.current.appendChild(overlay);
     }
 

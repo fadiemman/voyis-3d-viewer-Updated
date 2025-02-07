@@ -1,36 +1,60 @@
-/* Global styles for the app */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+/* In App.css (example) */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* or let .App handle overflow if needed */
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* So it spans the entire viewport height */
+  width: 100%;   /* Ensure it can fill the screen horizontally */
+  overflow: hidden; /* so no extra scroll if child is sized properly */
+}
+
+/* If you have a top nav, the remaining center area is also flex: */
+.main-content {
+  flex: 1;
+  display: flex; /* This row becomes a flex container */
+  transition: margin-left 0.3s ease; /* For your sidebar shift */
+  margin-left: 0;
+  overflow: hidden;       /* Hide scroll if child is sized properly */
+}
+
+.main-content.sidebar-open {
+  margin-left: 16rem; /* or your chosen sidebar width */
+}
+
+/* The center-panel that contains your 3D viewer */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* or row, depending on your layout */
+  overflow: hidden;       /* optional if you want to hide scrollbars */
+}
+
+/* The 3D viewer container itself */
+.three-d-viewer {
+  flex: 1;             /* Tells it to grow and fill the space */
+  width: 100%;         /* Ensure it’s not a fixed width */
+  height: 100%;        /* Fill parent’s height */
+  position: relative;  /* So Three.js can attach properly */
+}
+ 
+@media (max-width: 768px) {
+  .main-content.sidebar-open {
+    margin-left: 12rem; /* smaller shift on narrower screens */
   }
-  
-  .dashboard {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  
-  .main-content {
-    flex: 1;
-    display: flex;
-  }
-  
-  .left-panel {
-    width: 250px;
-    padding: 10px;
-    background: #f5f5f5;
-  }
-  
-  .center-panel {
-    flex: 1;
-    padding: 10px;
-  }
-  
-  .bottom-panel {
-    height: 100px;
-    background: #e0e0e0;
-    padding: 10px;
-  }
+}
+
+/* .bottom-panel {
+  height: 100px;
+  background: #e0e0e0;
+  padding: 10px;
+} */
   
   /* Add further styling as needed */
   
