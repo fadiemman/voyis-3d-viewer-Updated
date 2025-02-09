@@ -1,53 +1,72 @@
-/**
- * @file GISViewer.js
- * @description Component for rendering GIS data using Leaflet.js with proper cleanup.
- */
-
+// GISViewer.jsx
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/GISViewer.css';
 
-const GISViewer = () => {
-  // Reference for the map container div.
-  const mapContainerRef = useRef(null);
-  // Reference to store the Leaflet map instance.
+function GISViewer({ geoJsonData }) {
+  const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
   useEffect(() => {
-    if (mapContainerRef.current && !mapInstanceRef.current) {
-      // Create the Leaflet map using the container ref.
-      mapInstanceRef.current = L.map(mapContainerRef.current).setView([51.505, -0.09], 13);
+    // Initialize map only once
+    if (mapRef.current && !mapInstanceRef.current) {
+      const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
+      mapInstanceRef.current = map;
 
-      // Add OpenStreetMap tile layer.
+      // Add tile layer (OpenStreetMap by default)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapInstanceRef.current);
-
-      // Add a sample marker with a popup.
-      L.marker([51.5, -0.09]).addTo(mapInstanceRef.current)
-        .bindPopup('A sample marker')
-        .openPopup();
+      }).addTo(map);
     }
 
-    // Cleanup: only remove the map if its container still exists.
-    return () => {
-      if (
-        mapInstanceRef.current &&
-        mapInstanceRef.current._container &&
-        mapInstanceRef.current._container.parentNode
-      ) {
-        mapInstanceRef.current.remove();
-      }
-    };
-  }, []); // Run only once on mount
+    // If we have GeoJSON data, add it to the map
+    if (geoJsonData && mapInstanceRef.current) {
+      // Clear existing GeoJSON layers first (if any)
+      mapInstanceRef.current.eachLayer((layer) => {
+        // Don’t remove the base tile layer
+        if (layer.options && layer._leaflet_id !== undefined) {
+          if (!layer._url) { // this check avoids removing tileLayer
+            mapInstanceRef.current.removeLayer(layer);
+          }
+        }
+      });
+
+      // Create a Leaflet GeoJSON layer
+      const onEachFeature = (feature, layer) => {
+        // For each feature, you can set a popup or tooltip
+        let popupContent = '<p><strong>Coordinates:</strong></p>';
+        if (feature.geometry && feature.geometry.coordinates) {
+          popupContent += JSON.stringify(feature.geometry.coordinates);
+        }
+        if (feature.properties) {
+          popupContent += '<br/><strong>Properties:</strong> ' + JSON.stringify(feature.properties);
+        }
+        layer.bindPopup(popupContent);
+      };
+
+      const geoJsonLayer = L.geoJSON(geoJsonData, {
+        onEachFeature: onEachFeature,
+        // You can also set custom marker icons, style polygons, etc.
+        pointToLayer: (feature, latlng) => {
+          // Marker for point geometry
+          return L.marker(latlng);
+        }
+      });
+
+      geoJsonLayer.addTo(mapInstanceRef.current);
+
+      // Optionally fit bounds to the GeoJSON layer
+      mapInstanceRef.current.fitBounds(geoJsonLayer.getBounds());
+    }
+  }, [geoJsonData]);
 
   return (
-    <div className="gis-viewer">
-      {/* Use a ref instead of an id for the container */}
-      <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }}></div>
-    </div>
+    <div
+      ref={mapRef}
+      style={{ width: '100%', height: '100%' }}
+    />
   );
-};
+}
 
 export default GISViewer;

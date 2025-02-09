@@ -3,7 +3,7 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import Sidebar from "./Sidebar";
 import logo from "../assets/voyis-logo.png";
 
-export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload }) {
+export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload, onGeoJsonUpload, onSwitchTab }) {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "light"
   );
@@ -42,7 +42,10 @@ export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        // pass onSwitchTab to sidebar as well
+          onSwitchTab={onSwitchTab}
         onPointCloudUpload={onPointCloudUpload}
+        onGeoJsonUpload={onGeoJsonUpload}
       />
     </>
   );
