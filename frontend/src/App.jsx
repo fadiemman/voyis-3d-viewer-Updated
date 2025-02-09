@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Navbar from "./components/NavBar.jsx";
 import Dashboard from "./pages/Dashboard";
 import Sidebar from "./components/Sidebar";
+import BottomPanel from "./components/BottomPanel";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,6 +14,10 @@ function App() {
 
   // 2D data
   const [geoJsonData, setGeoJsonData] = useState(null);
+
+  // Bottom Panel
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(false);
+  const [logs, setLogs] = useState([]);
 
   // Which tab is active: '3d' or 'gis'
   const [activeTab, setActiveTab] = useState('3d');
@@ -38,6 +43,11 @@ function App() {
   function handlePointCloudUpload(points, meta) {
     setPointCloudData(points);
     setPointCloudMeta(meta);
+    console.log("Points", points)
+    setLogs((prevLogs) => [
+      ...prevLogs,
+      `Uploaded PCD file: ${meta.fileName} (${meta.size} KB) with ${meta.numPoints} points.`
+    ]);
   }
 
   /**
@@ -45,6 +55,10 @@ function App() {
    */
   function handleGeoJsonUpload(geoJsonObject, fileInfo) {
     setGeoJsonData(geoJsonObject);
+    setLogs((prevLogs) => [
+      ...prevLogs,
+      `Uploaded GeoJSON file: ${fileInfo.name} (${Math.round(fileInfo.size / 1024)} KB).`
+    ]);
   }
 
   /**
@@ -52,6 +66,12 @@ function App() {
    */
   function handleSwitchTab(tabName) {
     setActiveTab(tabName);
+
+    // Log the tab switch
+    setLogs((prevLogs) => [
+      ...prevLogs,
+      tabName === '3d' ? "Switched to 3D Viewer." : "Switched to GIS Map."
+    ]);
   }
 
   return (
@@ -83,8 +103,20 @@ function App() {
           geoJsonData={geoJsonData}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          setLogs={setLogs}
         />
       </div>
+      <BottomPanel
+        isOpen={bottomPanelOpen}
+        onToggle={() => {
+          setBottomPanelOpen(!bottomPanelOpen);
+          setLogs((prevLogs) => [
+            ...prevLogs,
+            bottomPanelOpen ? "Closed logs panel." : "Opened logs panel." // Log the toggle action
+          ]);
+        }}
+        logs={logs}
+      />
     </div>
   );
 }

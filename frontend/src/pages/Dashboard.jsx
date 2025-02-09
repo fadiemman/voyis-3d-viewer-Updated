@@ -3,15 +3,19 @@ import ThreeDViewer from '../components/ThreeDViewer';
 import GISViewer from '../components/GISViewer';
 import '../styles/App.css'; // for styling .viewer-tab-switch, etc.
 
-function Dashboard({ activeTab, setActiveTab, pointCloudData, geoJsonData }) {
+function Dashboard({ activeTab, setActiveTab, pointCloudData, geoJsonData, setLogs}) { 
   return (
     <div className="dashboard">
       <section className="center-panel">
         {/* Show 3D or GIS based on activeTab */}
         {activeTab === '3d' ? (
-          <ThreeDViewer pointCloudData={pointCloudData} />
+          <ThreeDViewer pointCloudData={pointCloudData}
+          setLogs={setLogs}
+          />
         ) : (
-          <GISViewer geoJsonData={geoJsonData} />
+          <GISViewer geoJsonData={geoJsonData} 
+          setLogs={setLogs}
+          />
         )}
 
         {/* The top-right tabs */}

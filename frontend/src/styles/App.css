@@ -87,6 +87,22 @@ html, body {
   height: 100%;        /* Fill parent’s height */
   position: relative;  /* So Three.js can attach properly */
 }
+
+.bottom-panel {
+  background: #f5f5f5;
+  transition: height 0.3s ease;
+  overflow: hidden; /* so when height=0, it's hidden */
+}
+.bottom-panel-header {
+  display: flex;
+  justify-content: space-between;
+  background: #ccc;
+  padding: 4px 8px;
+}
+.bottom-panel-content {
+  overflow-y: auto; /* if logs is large, scroll within the panel */
+  height: calc(100% - 30px); /* adjust for header height */
+}
  
 @media (max-width: 768px) {
   .main-content.sidebar-open {

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 // If needed: import ResizeObserver from '@juggle/resize-observer';
 
-const ThreeDViewer = ({ pointCloudData }) => {
+const ThreeDViewer = ({ pointCloudData, setLogs }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +21,11 @@ const ThreeDViewer = ({ pointCloudData }) => {
     const controls = new OrbitControls(camera, renderer.domElement);
     camera.position.set(0, 0, 15);
     controls.update();
+
+    // Log interactions in the 3D Viewer
+    controls.addEventListener('change', () => {
+      setLogs((prevLogs) => [...prevLogs, "3D Viewer interaction: Scene updated."]);
+    });
 
     let geometry = new THREE.BufferGeometry();
     let positions, colors;

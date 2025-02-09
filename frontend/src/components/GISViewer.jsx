@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/GISViewer.css';
 
-function GISViewer({ geoJsonData }) {
+function GISViewer({ geoJsonData, setLogs }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
@@ -13,11 +13,28 @@ function GISViewer({ geoJsonData }) {
     if (mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
       mapInstanceRef.current = map;
+      
+      // Log zoom and move interactions
+      map.on('moveend', () => {
+        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Map moved."]);
+      });
+      map.on('zoomend', () => {
+        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Zoom level changed."]);
+      });
 
       // Add tile layer (OpenStreetMap by default)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
+    }
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.on('moveend', () => {
+        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Map moved."]);
+      });
+      mapInstanceRef.current.on('zoomend', () => {
+        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Zoom level changed."]);
+      });
     }
 
 

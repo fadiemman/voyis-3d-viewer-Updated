@@ -41,6 +41,9 @@ function Sidebar({
     setUploadProgress(0);
     setIsLoading(false);
 
+    // Log the cancellation
+    setLogs((prevLogs) => [...prevLogs, "Canceled file upload. Reverted to demo data."]);
+
     // Also revert the viewer data, based on extension
     const ext = fileInfo.extension;
     if (ext === 'pcd' || ext === 'xyz') {
@@ -139,11 +142,19 @@ function Sidebar({
           if ((extension === 'pcd' || extension === 'xyz') && onPointCloudUpload) {
             // result = { points, meta }
             onPointCloudUpload(result.points, result.meta);
+            setLogs((prevLogs) => [
+              ...prevLogs,
+              `Uploaded PCD file: ${file.name} (${Math.round(file.size / 1024)} KB) with ${result.meta.numPoints} points.`
+            ]);
           } else if ((extension === 'json' || extension === 'geojson') && onGeoJsonUpload) {
             onGeoJsonUpload(result, {
               name: file.name,
               size: file.size
             });
+            setLogs((prevLogs) => [
+              ...prevLogs,
+              `Uploaded GeoJSON file: ${file.name} (${Math.round(file.size / 1024)} KB).`
+            ]);
           }
         }
       }, 200);
@@ -166,6 +177,7 @@ function Sidebar({
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) processFile(file);
+    console.log(e)
   };
 
   /**
