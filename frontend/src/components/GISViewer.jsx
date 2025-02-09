@@ -20,6 +20,7 @@ function GISViewer({ geoJsonData }) {
       }).addTo(map);
     }
 
+
     // If we have GeoJSON data, add it to the map
     if (geoJsonData && mapInstanceRef.current) {
       // Clear existing GeoJSON layers first (if any)

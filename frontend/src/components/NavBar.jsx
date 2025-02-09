@@ -1,9 +1,12 @@
+// Navbar.jsx
 import { useState, useEffect } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
-import Sidebar from "./Sidebar";
 import logo from "../assets/voyis-logo.png";
 
-export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload, onGeoJsonUpload, onSwitchTab }) {
+/**
+ * Minimal navbar that toggles the sidebar with setSidebarOpen
+ */
+export default function Navbar({ sidebarOpen, setSidebarOpen }) {
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "light"
   );
@@ -17,7 +20,6 @@ export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload
     <>
       <nav className="relative z-50 flex justify-between items-center p-4 bg-white dark:bg-gray-900 shadow-md transition-colors duration-200">
         <div className="flex items-center gap-4">
-          {/* Instead of using local state, just call setSidebarOpen */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors"
@@ -39,14 +41,6 @@ export default function Navbar({ sidebarOpen, setSidebarOpen, onPointCloudUpload
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>
       </nav>
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        // pass onSwitchTab to sidebar as well
-          onSwitchTab={onSwitchTab}
-        onPointCloudUpload={onPointCloudUpload}
-        onGeoJsonUpload={onGeoJsonUpload}
-      />
     </>
   );
 }

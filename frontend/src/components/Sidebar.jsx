@@ -4,60 +4,102 @@ import { X, Loader2 } from "lucide-react";
 import { parsePCD, parseXYZ } from "../utils/parseUtils.jsx";
 
 /**
- * @param {boolean} isOpen - Whether the sidebar is open.
- * @param {function} onClose - Function to close the sidebar.
- * @param {function} onPointCloudUpload - Callback when a .pcd or .xyz is parsed; signature: (points, meta).
- * @param {function} onGeoJsonUpload - Callback when a .geojson/.json is parsed; signature: (geoObject, fileInfo).
- * @param {function} onSwitchTab - (Optional) A callback to automatically switch to '3d' or 'gis' tab in the parent.
+ * Sidebar handles uploading .pcd/.xyz/.json/.geojson,
+ * auto-clears opposite data, auto-switches tab, etc.
  */
-function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitchTab }) {
+function Sidebar({
+  isOpen,
+  onClose,
+  // Callbacks for final parse
+  onPointCloudUpload,
+  onGeoJsonUpload,
+
+  // Optional: auto-switch tabs
+  onSwitchTab,
+
+  // Clearing old data (3D or GIS)
+  onClearPointCloud,
+  onClearGeoJson
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  /**
+   * fileInfo = {
+   *   name, size, extension,
+   *   numPoints, boundingBox
+   * }
+   */
   const [fileInfo, setFileInfo] = useState(null);
 
   /**
-   * Parses the selected file based on extension and simulates an upload progress bar.
+   * Cancel button -> revert to demo data
+   */
+  const handleCancelFile = () => {
+    if (!fileInfo) return;
+    setFileInfo(null);
+    setUploadProgress(0);
+    setIsLoading(false);
+
+    // Also revert the viewer data, based on extension
+    const ext = fileInfo.extension;
+    if (ext === 'pcd' || ext === 'xyz') {
+      onClearPointCloud?.();
+    } else if (ext === 'json' || ext === 'geojson') {
+      onClearGeoJson?.();
+    }
+  };
+
+  /**
+   * Parse logic for a single file
    */
   const processFile = (file) => {
     if (!file) return;
-    setIsLoading(true);
-    setUploadProgress(0);
 
-    // Basic file info (filename, size).
-    setFileInfo({ name: file.name, size: file.size });
-
-    // Determine the file extension
     const extension = file.name.split('.').pop().toLowerCase();
 
-    // If you want automatic tab switching, do it right here
+    // Clear old data first
+    if (extension === 'pcd' || extension === 'xyz') {
+      onClearGeoJson?.();
+    } else if (extension === 'json' || extension === 'geojson') {
+      onClearPointCloud?.();
+    }
+
+    // Auto-switch tabs if desired
     if (onSwitchTab) {
       if (extension === 'pcd' || extension === 'xyz') {
-        onSwitchTab('3d');     // Switch to 3D viewer
+        onSwitchTab('3d');
       } else if (extension === 'json' || extension === 'geojson') {
-        onSwitchTab('gis');    // Switch to GIS map
+        onSwitchTab('gis');
       }
     }
 
+    // Begin reading
+    setIsLoading(true);
+    setUploadProgress(0);
+    setFileInfo({
+      name: file.name,
+      size: file.size,
+      extension
+    });
+
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const content = evt.target.result; // The file content
+      const content = evt.target.result;
       let result = null;
 
       try {
         if (extension === 'pcd') {
-          // .pcd => parse binary or ASCII point cloud
           result = parsePCD(content);
         } else if (extension === 'xyz') {
-          // .xyz => parse as text with parseXYZ
           const textDecoder = new TextDecoder();
           const text = textDecoder.decode(content);
           result = parseXYZ(text);
-        } else if (extension === 'geojson' || extension === 'json') {
-          // .geojson / .json => parse as text-based JSON
+        } else if (extension === 'json' || extension === 'geojson') {
           const geoObj = JSON.parse(content);
-          result = geoObj; // We'll store it in 'result'
+          result = geoObj;
         } else {
-          alert(`Unsupported file extension: .${extension}`);
+          alert(`Unsupported extension: .${extension}`);
           setIsLoading(false);
           return;
         }
@@ -67,29 +109,22 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
         return;
       }
 
-      // If it's a .pcd or .xyz, we might have result.points and result.meta
-      // If it's .geojson / .json, result might be an object.
-
-      // We'll store additional metadata for .pcd/xyz if available:
-      let numPoints;
-      let boundingBox;
-
-      if (extension === 'pcd' || extension === 'xyz') {
-        // parsePCD or parseXYZ returns { points, meta }
-        if (result.meta) {
-          numPoints = result.meta.numPoints;
-          boundingBox = result.meta.boundingBox;
-        }
+      // If pcd/xyz => we might have result.points, result.meta
+      let numPoints = undefined;
+      let boundingBox = undefined;
+      if ((extension === 'pcd' || extension === 'xyz') && result.meta) {
+        numPoints = result.meta.numPoints;
+        boundingBox = result.meta.boundingBox;
       }
 
-      // Update fileInfo with parse results:
+      // Update local file info
       setFileInfo((prev) => ({
         ...prev,
         numPoints,
-        boundingBox,
+        boundingBox
       }));
 
-      // Simulate progress for the "upload"
+      // Simulate progress
       let progress = 0;
       const simulateProgress = setInterval(() => {
         progress += 20;
@@ -100,43 +135,41 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
           setUploadProgress(100);
           setIsLoading(false);
 
-          // Once the "upload" is complete, call the appropriate callback
+          // Pass data up
           if ((extension === 'pcd' || extension === 'xyz') && onPointCloudUpload) {
-            // e.g. parsePCD => result = { points, meta }
+            // result = { points, meta }
             onPointCloudUpload(result.points, result.meta);
-          } else if ((extension === 'geojson' || extension === 'json') && onGeoJsonUpload) {
-            // e.g. .json => result is the geoObj
+          } else if ((extension === 'json' || extension === 'geojson') && onGeoJsonUpload) {
             onGeoJsonUpload(result, {
               name: file.name,
-              size: file.size,
+              size: file.size
             });
           }
         }
       }, 200);
     };
 
-    // If .pcd or .xyz => read as array buffer.
-    // If .json/.geojson => read as text.
+    // read the file as array buffer or text
     if (extension === 'pcd' || extension === 'xyz') {
       reader.readAsArrayBuffer(file);
-    } else if (extension === 'geojson' || extension === 'json') {
+    } else if (extension === 'json' || extension === 'geojson') {
       reader.readAsText(file);
     } else {
-      // You might handle other cases or fallback
+      // fallback
       reader.readAsArrayBuffer(file);
     }
   };
 
   /**
-   * Handler for the file <input> selection
+   * Handler for <input>
    */
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
     if (file) processFile(file);
   };
 
   /**
-   * Drag and drop handlers
+   * Drag & drop
    */
   const handleDragOver = (e) => e.preventDefault();
   const handleDrop = (e) => {
@@ -147,7 +180,7 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
     }
   };
 
-  if (!isOpen) return null; // If sidebar is closed, render nothing
+  if (!isOpen) return null;
 
   return (
     <div
@@ -155,7 +188,7 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      {/* Close Button */}
+      {/* Close button */}
       <button
         onClick={onClose}
         className="p-2 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-full"
@@ -185,18 +218,28 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
           </div>
         </label>
         <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-          Accepted formats: .pcd, .xyz, .json, .geojson
+          Accepted: .pcd, .xyz, .json, .geojson
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-          (Drag & Drop also works)
+          (Drag & Drop works)
         </p>
       </div>
 
-      {/* Show progress bar & file info if file is set */}
+      {/* File info */}
       {fileInfo && (
         <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
           <p>Filename: {fileInfo.name}</p>
           <p>Size: {Math.round(fileInfo.size / 1024)} KB</p>
+
+          {/* Cancel button */}
+          <span
+            style={{ cursor: 'pointer', color: 'red' }}
+            onClick={handleCancelFile}
+          >
+            [Cancel File]
+          </span>
+
+          {/* If pcd/xyz => show points & bounding box */}
           {fileInfo.numPoints !== undefined && (
             <p>Points: {fileInfo.numPoints}</p>
           )}
@@ -208,6 +251,8 @@ function Sidebar({ isOpen, onClose, onPointCloudUpload, onGeoJsonUpload, onSwitc
               <p>Z: [{fileInfo.boundingBox.minZ.toFixed(2)}, {fileInfo.boundingBox.maxZ.toFixed(2)}]</p>
             </div>
           )}
+
+          {/* Progress Bar */}
           <div
             className="progress-bar"
             style={{ background: '#ddd', borderRadius: '4px', marginTop: '5px' }}

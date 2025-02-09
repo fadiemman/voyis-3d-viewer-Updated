@@ -35,12 +35,49 @@ html, body {
   margin-left: 16rem; /* or your chosen sidebar width */
 }
 
-/* The center-panel that contains your 3D viewer */
+.center-panel {
+  position: relative; /* so we can absolutely position inside it */
+}
+
+/* 
 .center-panel {
   flex: 1;
   display: flex;
-  flex-direction: column; /* or row, depending on your layout */
-  overflow: hidden;       /* optional if you want to hide scrollbars */
+  flex-direction: column; 
+  overflow: hidden;       
+  position: relative; 
+} */
+
+
+.viewer-tab-switch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  /* Make sure it’s above Leaflet or Three.js canvas */
+  z-index: 2000;
+
+  /* Some background color so text is clearly visible.
+     Could be fully opaque, or semi-transparent. */
+  background: rgba(255, 255, 255, 0.8);
+
+  border-radius: 4px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 10px;
+}
+
+.viewer-tab-switch span {
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #000; /* Make sure text is visible on the white background */
+}
+
+/* When this tab is selected, highlight it clearly */
+.viewer-tab-switch span.tab-selected {
+  background: #2196f3; /* or your brand color */
+  color: #fff;
 }
 
 /* The 3D viewer container itself */
