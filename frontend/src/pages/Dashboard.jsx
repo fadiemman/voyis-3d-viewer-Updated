@@ -44,7 +44,7 @@ import '../styles/App.css'; // for styling .viewer-tab-switch, etc.
 function Dashboard({ activeTab, setActiveTab, pointCloudData, geoJsonData, setLogs, bottomPanelOpen }) { 
   return (
     <div className={`dashboard ${bottomPanelOpen ? 'bottom-panel-open' : ''}`}>
-      <section className="center-panel" style={{ height: `calc(100vh - ${bottomPanelOpen ? '200px' : '10px'})` }}>
+      <section className="center-panel" style={{ height: `calc(100vh - ${bottomPanelOpen ? '270px' : '10px'})` }}>
         {/* Show 3D or GIS based on activeTab */}
         {activeTab === '3d' ? (
           <ThreeDViewer pointCloudData={pointCloudData} setLogs={setLogs} />

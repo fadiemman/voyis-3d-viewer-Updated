@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/GISViewer.css';
 
-function GISViewer({ geoJsonData, setLogs }) {
+function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
@@ -82,7 +82,7 @@ function GISViewer({ geoJsonData, setLogs }) {
   return (
     <div
       ref={mapRef}
-      style={{ width: '100%', height: '100%' }}
+      style={{ width: '100%', height: bottomPanelOpen ? '95%' : '87%' }}
     />
   );
 }
