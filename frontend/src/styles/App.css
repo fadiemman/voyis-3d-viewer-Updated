@@ -25,18 +25,23 @@ html, body {
 /* If you have a top nav, the remaining center area is also flex: */
 .main-content {
   flex: 1;
-  display: flex; /* This row becomes a flex container */
-  transition: margin-left 0.3s ease; /* For your sidebar shift */
-  margin-left: 0;
-  overflow: hidden;       /* Hide scroll if child is sized properly */
+  display: flex;
+  transition: all 0.3s ease; /* Smooth transitions */
+  overflow: hidden;
 }
 
 .main-content.sidebar-open {
   margin-left: 16rem; /* or your chosen sidebar width */
 }
 
+.main-content.bottom-panel-open {
+  height: calc(100vh - 200px); /* Adjust height for the bottom panel */
+}
+
 .center-panel {
-  position: relative; /* so we can absolutely position inside it */
+  width: 100%;
+  height: 100%;
+  transition: height 0.3s ease; /* Smooth transition for height */
 }
 
 /* 
@@ -46,25 +51,18 @@ html, body {
   flex-direction: column; 
   overflow: hidden;       
   position: relative; 
+  position: relative; 
 } */
 
 
 .viewer-tab-switch {
   position: absolute;
-  top: 10px;
-  right: 10px;
-
-  /* Make sure it’s above Leaflet or Three.js canvas */
+  top: 90px; /* Adjust this if necessary */
+  right: 20px;
   z-index: 2000;
-
-  /* Some background color so text is clearly visible.
-     Could be fully opaque, or semi-transparent. */
   background: rgba(255, 255, 255, 0.8);
-
+  padding: 8px;
   border-radius: 4px;
-  padding: 4px 8px;
-  display: flex;
-  gap: 10px;
 }
 
 .viewer-tab-switch span {
@@ -93,6 +91,7 @@ html, body {
   transition: height 0.3s ease;
   overflow: hidden; /* so when height=0, it's hidden */
 }
+
 .bottom-panel-header {
   display: flex;
   justify-content: space-between;
@@ -103,6 +102,32 @@ html, body {
   overflow-y: auto; /* if logs is large, scroll within the panel */
   height: calc(100% - 30px); /* adjust for header height */
 }
+
+.dashboard.bottom-panel-open {
+  height: calc(100vh - 200px); /* Adjust height for the bottom panel */
+}
+
+.dashboard.bottom-panel-open .center-panel {
+  height: calc(100vh - 200px); /* Adjust central panel height */
+}
+
+.bottom-panel .overflow-y-auto {
+  scrollbar-width: thin; /* Firefox */
+}
+
+.bottom-panel .overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bottom-panel .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888; /* Darker color for thumb */
+  border-radius: 4px;
+}
+
+.bottom-panel .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker on hover */
+}
+
  
 @media (max-width: 768px) {
   .main-content.sidebar-open {
@@ -115,6 +140,3 @@ html, body {
   background: #e0e0e0;
   padding: 10px;
 } */
-  
-  /* Add further styling as needed */
-  

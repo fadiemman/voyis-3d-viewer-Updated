@@ -88,3 +88,57 @@ function GISViewer({ geoJsonData, setLogs }) {
 }
 
 export default GISViewer;
+
+
+// import React, { useEffect, useRef } from 'react';
+// import L from 'leaflet';
+// import 'leaflet/dist/leaflet.css';
+// import '../styles/GISViewer.css';
+
+// function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
+//   const mapRef = useRef(null);
+//   const mapInstanceRef = useRef(null);
+
+//   useEffect(() => {
+//     if (mapRef.current && !mapInstanceRef.current) {
+//       const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
+//       mapInstanceRef.current = map;
+
+//       map.on('moveend', () => {
+//         setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Map moved."]);
+//       });
+//       map.on('zoomend', () => {
+//         setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Zoom level changed."]);
+//       });
+
+//       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//         attribution: '&copy; OpenStreetMap contributors',
+//       }).addTo(map);
+//     }
+
+//     // Adjust the map size dynamically when the bottom panel state changes
+//     const resizeObserver = new ResizeObserver(() => {
+//       if (mapInstanceRef.current) {
+//         mapInstanceRef.current.invalidateSize();
+//       }
+//     });
+//     resizeObserver.observe(mapRef.current);
+
+//     return () => {
+//       resizeObserver.disconnect();
+//     };
+//   }, [bottomPanelOpen]);
+
+//   return (
+//     <div
+//       ref={mapRef}
+//       style={{
+//         width: '100%',
+//         height: `calc(100vh - ${bottomPanelOpen ? '200px' : '10px'})`,
+//       }}
+//     />
+//   );
+// }
+
+// export default GISViewer;
+

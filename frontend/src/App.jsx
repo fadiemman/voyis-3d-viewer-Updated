@@ -96,7 +96,11 @@ function App() {
       />
 
       {/* The main content area, showing 3D or GIS based on activeTab */}
-      <div className={sidebarOpen ? "main-content sidebar-open" : "main-content"}>
+      <div
+        className={`main-content ${
+          sidebarOpen ? "sidebar-open" : ""
+        } ${bottomPanelOpen ? "bottom-panel-open" : ""}`}
+      >
         <Dashboard
           pointCloudData={pointCloudData}
           pointCloudMeta={pointCloudMeta}
@@ -104,6 +108,7 @@ function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           setLogs={setLogs}
+          bottomPanelOpen={bottomPanelOpen} // Pass bottomPanel state
         />
       </div>
       <BottomPanel

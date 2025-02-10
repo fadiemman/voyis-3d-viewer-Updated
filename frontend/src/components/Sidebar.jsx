@@ -41,15 +41,13 @@ function Sidebar({
     setUploadProgress(0);
     setIsLoading(false);
 
-    // Log the cancellation
-    setLogs((prevLogs) => [...prevLogs, "Canceled file upload. Reverted to demo data."]);
-
-    // Also revert the viewer data, based on extension
-    const ext = fileInfo.extension;
-    if (ext === 'pcd' || ext === 'xyz') {
+    // Revert viewer data to demo mode
+    if (fileInfo.extension === 'pcd' || fileInfo.extension === 'xyz') {
       onClearPointCloud?.();
-    } else if (ext === 'json' || ext === 'geojson') {
+      setLogs((prevLogs) => [...prevLogs, "Switched to 3D Viewer demo data."]);
+    } else if (fileInfo.extension === 'json' || fileInfo.extension === 'geojson') {
       onClearGeoJson?.();
+      setLogs((prevLogs) => [...prevLogs, "Switched to GIS Map demo data."]);
     }
   };
 
