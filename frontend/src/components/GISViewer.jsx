@@ -12,7 +12,8 @@ function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [timeRange, setTimeRange] = useState([0, 100]);
-
+  console.log("GeoJson data", geoJsonData);
+  console.log("mapRef", mapRef);
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
@@ -32,8 +33,8 @@ function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
       }
 
       const timestamps = geoJsonData.features
-        .map((feature) => feature.properties?.timestamp)
-        .filter((timestamp) => timestamp !== undefined);
+          .map((feature) => feature.properties?.timestamp)
+          .filter((timestamp) => timestamp !== undefined);
 
       if (timestamps.length > 0) {
         const minTime = Math.min(...timestamps);
@@ -59,16 +60,18 @@ function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
         },
       }).addTo(mapInstanceRef.current);
 
-      // Ensure the layer has valid bounds before applying fitBounds()
       const bounds = geoJsonLayerRef.current.getBounds();
       if (bounds.isValid()) {
         mapInstanceRef.current.fitBounds(bounds);
-      } else {
-        console.warn("GeoJSON data does not contain valid bounds.");
       }
-
-      setLogs((prevLogs) => [...prevLogs, "GeoJSON data loaded with metadata display."]);
     }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, [geoJsonData, currentTime, setLogs]);
 
   useEffect(() => {
