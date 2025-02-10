@@ -12,8 +12,6 @@ function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [timeRange, setTimeRange] = useState([0, 100]);
-  console.log("GeoJson data", geoJsonData);
-  console.log("mapRef", mapRef);
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
