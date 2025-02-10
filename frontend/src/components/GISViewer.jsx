@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+// GISViewer.jsx
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../styles/GISViewer.css';
@@ -8,96 +9,112 @@ function GISViewer({ geoJsonData, setLogs, bottomPanelOpen }) {
   const mapInstanceRef = useRef(null);
   const geoJsonLayerRef = useRef(null);
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [timeRange, setTimeRange] = useState([0, 100]);
+
   useEffect(() => {
-    // Initialize map only once
     if (mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current).setView([51.505, -0.09], 13);
       mapInstanceRef.current = map;
 
-      // Add event listeners
-      map.on('moveend', () => {
-        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Map moved."]);
-      });
-      map.on('zoomend', () => {
-        setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Zoom level changed."]);
-      });
-
-      // Add base tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors',
       }).addTo(map);
+
+      map.on('moveend', () => setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Map moved."]));
+      map.on('zoomend', () => setLogs((prevLogs) => [...prevLogs, "GIS Map interaction: Zoom level changed."]));
     }
 
-    // Handle geoJsonData changes
-    if (mapInstanceRef.current) {
-      // Clear existing GeoJSON layer if it exists
+    if (geoJsonData && mapInstanceRef.current) {
       if (geoJsonLayerRef.current) {
         geoJsonLayerRef.current.removeFrom(mapInstanceRef.current);
-        geoJsonLayerRef.current = null;
       }
 
-      // Add new GeoJSON data if available
-      if (geoJsonData) {
-        const onEachFeature = (feature, layer) => {
-          let popupContent = '<p><strong>Coordinates:</strong></p>';
+      const timestamps = geoJsonData.features
+        .map((feature) => feature.properties?.timestamp)
+        .filter((timestamp) => timestamp !== undefined);
+
+      if (timestamps.length > 0) {
+        const minTime = Math.min(...timestamps);
+        const maxTime = Math.max(...timestamps);
+        setTimeRange([minTime, maxTime]);
+        setCurrentTime(minTime);
+      }
+
+      geoJsonLayerRef.current = L.geoJSON(geoJsonData, {
+        filter: (feature) => !feature.properties.timestamp || feature.properties.timestamp <= currentTime,
+        onEachFeature: (feature, layer) => {
+          let popupContent = `<strong>Metadata:</strong><br>`;
           if (feature.geometry && feature.geometry.coordinates) {
-            popupContent += JSON.stringify(feature.geometry.coordinates);
+            popupContent += `<strong>Coordinates:</strong> ${feature.geometry.coordinates.join(', ')}<br>`;
           }
           if (feature.properties) {
-            popupContent += '<br/><strong>Properties:</strong> ' + JSON.stringify(feature.properties);
+            const { timestamp, tags, description } = feature.properties;
+            if (timestamp) popupContent += `<strong>Timestamp:</strong> ${timestamp}<br>`;
+            if (tags) popupContent += `<strong>Tags:</strong> ${tags}<br>`;
+            if (description) popupContent += `<strong>Description:</strong> ${description}<br>`;
           }
           layer.bindPopup(popupContent);
-        };
+        },
+      }).addTo(mapInstanceRef.current);
 
-        const geoJsonLayer = L.geoJSON(geoJsonData, {
-          onEachFeature: onEachFeature,
-          pointToLayer: (feature, latlng) => {
-            return L.marker(latlng);
-          }
-        });
-
-        geoJsonLayer.addTo(mapInstanceRef.current);
-        geoJsonLayerRef.current = geoJsonLayer;
-
-        // Fit bounds to show all data points
-        mapInstanceRef.current.fitBounds(geoJsonLayer.getBounds());
-
-        setLogs((prevLogs) => [...prevLogs, "GeoJSON data loaded on map."]);
+      // Ensure the layer has valid bounds before applying fitBounds()
+      const bounds = geoJsonLayerRef.current.getBounds();
+      if (bounds.isValid()) {
+        mapInstanceRef.current.fitBounds(bounds);
       } else {
-        // Reset view when no data is present
-        mapInstanceRef.current.setView([51.505, -0.09], 13);
-        setLogs((prevLogs) => [...prevLogs, "Map reset - no GeoJSON data present."]);
+        console.warn("GeoJSON data does not contain valid bounds.");
       }
+
+      setLogs((prevLogs) => [...prevLogs, "GeoJSON data loaded with metadata display."]);
     }
+  }, [geoJsonData, currentTime, setLogs]);
 
-    // Cleanup function
-    return () => {
-      if (mapInstanceRef.current && geoJsonLayerRef.current) {
-        geoJsonLayerRef.current.removeFrom(mapInstanceRef.current);
-        geoJsonLayerRef.current = null;
-      }
-    };
-  }, [geoJsonData, setLogs]);
-
-  // Handle resize when bottom panel changes
   useEffect(() => {
-    if (mapInstanceRef.current) {
-      setTimeout(() => {
-        mapInstanceRef.current.invalidateSize();
-      }, 300); // Wait for panel animation to complete
+    let interval;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentTime((prevTime) =>
+          prevTime < timeRange[1] ? prevTime + 1 : timeRange[0]
+        );
+      }, 500);
     }
-  }, [bottomPanelOpen]);
+    return () => clearInterval(interval);
+  }, [isPlaying, timeRange]);
 
   return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <div
-          ref={mapRef}
-          style={{
-            width: '100%',
-            height: bottomPanelOpen ? '95%' : '87%',
-            transition: 'height 0.3s ease-in-out'
-          }}
+        ref={mapRef}
+        style={{
+          width: '100%',
+          height: bottomPanelOpen ? '95%' : '87%',
+          transition: 'height 0.3s ease-in-out',
+        }}
       />
+      {geoJsonData && timeRange[1] > timeRange[0] && (
+        <div className="time-controls" style={{ position: 'absolute', bottom: 10, left: 10 }}>
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            style={{ marginRight: '10px' }}
+          >
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          <input
+            type="range"
+            min={timeRange[0]}
+            max={timeRange[1]}
+            value={currentTime}
+            onChange={(e) => setCurrentTime(Number(e.target.value))}
+          />
+          <span style={{ marginLeft: '10px' }}>{currentTime}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
 export default GISViewer;
+
+

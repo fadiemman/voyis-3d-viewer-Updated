@@ -21,6 +21,8 @@ function App() {
 
   // Which tab is active: '3d' or 'gis'
   const [activeTab, setActiveTab] = useState('3d');
+  // Add state for altitude range
+  const [altitudeRange, setAltitudeRange] = useState([-Infinity, Infinity]);
 
   /**
    * Clears the 3D data => revert the 3D viewer to demo data.
@@ -45,7 +47,7 @@ function App() {
     setPointCloudMeta(meta);
     setLogs((prevLogs) => [
       ...prevLogs,
-      `Uploaded PCD file: ${meta.fileName} (${meta.size} KB) with ${meta.numPoints} points.`
+      `Uploaded PCD file`
     ]);
   }
 
@@ -86,6 +88,9 @@ function App() {
         onSwitchTab={handleSwitchTab} // auto-switch tabs
         onClearPointCloud={handleClearPointCloud}
         onClearGeoJson={handleClearGeoJson}
+
+        altitudeRange={altitudeRange} // Pass altitude range
+        setAltitudeRange={setAltitudeRange} // Pass setter for altitude range
       />
 
       {/* Our top navbar that toggles sidebar */}
@@ -108,6 +113,7 @@ function App() {
           setActiveTab={setActiveTab}
           setLogs={setLogs}
           bottomPanelOpen={bottomPanelOpen} // Pass bottomPanel state
+          altitudeRange={altitudeRange} // Pass altitude range to Dashboard
         />
       </div>
       <BottomPanel
