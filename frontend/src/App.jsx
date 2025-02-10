@@ -43,7 +43,6 @@ function App() {
   function handlePointCloudUpload(points, meta) {
     setPointCloudData(points);
     setPointCloudMeta(meta);
-    console.log("Points", points)
     setLogs((prevLogs) => [
       ...prevLogs,
       `Uploaded PCD file: ${meta.fileName} (${meta.size} KB) with ${meta.numPoints} points.`
@@ -80,7 +79,7 @@ function App() {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-
+        setLogs={setLogs}
         onPointCloudUpload={handlePointCloudUpload}
         onGeoJsonUpload={handleGeoJsonUpload}
 

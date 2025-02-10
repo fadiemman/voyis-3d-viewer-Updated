@@ -292,7 +292,7 @@
 
 // Sidebar.jsx
 import React, { useState } from 'react';
-import { X, Loader2 } from "lucide-react";
+import {X, Loader2, Trash2} from "lucide-react";
 import { parsePCD, parseXYZ } from "../utils/parseUtils.jsx";
 
 /**
@@ -311,7 +311,7 @@ function Sidebar({
 
   // Clearing old data (3D or GIS)
   onClearPointCloud,
-  onClearGeoJson
+  onClearGeoJson, setLogs
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -486,7 +486,7 @@ function Sidebar({
       </button>
 
       {/* Upload UI */}
-      <div className="mt-6 p-4 border-2 border-dashed border-gray-400 justify-center rounded-lg text-center">
+      <div className="mt-6 p-4 border-2 border-dashed border-gray-400 dark:text-white justify-center rounded-lg text-center">
         <label className="cursor-pointer">
           <input
             type="file"
@@ -511,18 +511,21 @@ function Sidebar({
 
       {/* File info */}
       {fileInfo && (
-        <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-          <p>Filename: {fileInfo.name}</p>
-          <p>Size: {Math.round(fileInfo.size / 1024)} KB</p>
+          <div className="mt-4 p-4 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg">
+            <div className="space-y-2">
+              <p>Filename: {fileInfo.name}</p>
+              <p>Size: {Math.round(fileInfo.size / 1024)} KB</p>
+            </div>
 
-          {/* Cancel button */}
-          <span
-            style={{ cursor: 'pointer', color: 'red' }}
-            onClick={handleCancelFile}
-          >
-            [Cancel File]
-          </span>
-        </div>
+            <div className="flex justify-end mt-2">
+              <button
+                  onClick={handleCancelFile}
+                  className="text-red-600 hover:text-red-700 transition-colors"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
       )}
     </div>
   );
