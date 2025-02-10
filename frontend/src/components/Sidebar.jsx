@@ -292,7 +292,7 @@
 
 // Sidebar.jsx
 import React, { useState } from 'react';
-import { X, Loader2 } from "lucide-react";
+import {X, Loader2, Trash2} from "lucide-react";
 import { parsePCD, parseXYZ } from "../utils/parseUtils.jsx";
 
 /**
@@ -311,7 +311,7 @@ function Sidebar({
 
   // Clearing old data (3D or GIS)
   onClearPointCloud,
-  onClearGeoJson
+  onClearGeoJson, setLogs
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -467,8 +467,8 @@ function Sidebar({
         <X size={24} />
       </button>
 
-      {/* Upload Section */}
-      <div className="mt-6 p-4 border-2 border-dashed border-gray-400 justify-center rounded-lg text-center">
+      {/* Upload UI */}
+      <div className="mt-6 p-4 border-2 border-dashed border-gray-400 dark:text-white justify-center rounded-lg text-center">
         <label className="cursor-pointer">
           <input
             type="file"
@@ -496,39 +496,21 @@ function Sidebar({
 
       {/* File Info and Progress */}
       {fileInfo && (
-        <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-          <p>Filename: {fileInfo.name}</p>
-          <p>File Size: {Math.round(fileInfo.size / 1024)} KB</p>
-          {fileInfo.numPoints !== undefined && <p>Points: {fileInfo.numPoints}</p>}
-          {fileInfo.boundingBox && (
-            <div>
-              <p>Bounding Box:</p>
-              <p>X: [{fileInfo.boundingBox.minX.toFixed(2)}, {fileInfo.boundingBox.maxX.toFixed(2)}]</p>
-              <p>Y: [{fileInfo.boundingBox.minY.toFixed(2)}, {fileInfo.boundingBox.maxY.toFixed(2)}]</p>
-              <p>Z: [{fileInfo.boundingBox.minZ.toFixed(2)}, {fileInfo.boundingBox.maxZ.toFixed(2)}]</p>
+          <div className="mt-4 p-4 bg-gray-100 dark:text-white dark:bg-gray-700 rounded-lg">
+            <div className="space-y-2">
+              <p>Filename: {fileInfo.name}</p>
+              <p>Size: {Math.round(fileInfo.size / 1024)} KB</p>
             </div>
-          )}
-          <div className="progress-bar" style={{ background: '#ddd', borderRadius: '4px', marginTop: '5px' }}>
-            <div
-              className="progress"
-              style={{
-                width: `${uploadProgress}%`,
-                background: 'green',
-                color: 'white',
-                textAlign: 'center',
-                borderRadius: '4px'
-              }}
-            >
-              {uploadProgress}%
+
+            <div className="flex justify-end mt-2">
+              <button
+                  onClick={handleCancelFile}
+                  className="text-red-600 hover:text-red-700 transition-colors"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <span
-            style={{ cursor: 'pointer', color: 'red' }}
-            onClick={handleCancelFile}
-          >
-            [Cancel File]
-          </span>
-        </div>
       )}
     </div>
   );
