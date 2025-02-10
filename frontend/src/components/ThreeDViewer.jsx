@@ -294,9 +294,9 @@ const ThreeDViewer = ({ pointCloudData, setLogs }) => {
           Point Size:
           <input
             type="range"
-            min="0.1"
-            max="1.0"
-            step="0.1"
+            min="0.01"
+            max="0.5"
+            step="0.01"
             value={pointSize}
             onChange={(e) => setPointSize(parseFloat(e.target.value))}
           />
