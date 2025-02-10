@@ -56,7 +56,7 @@ function BottomPanel({ isOpen, onToggle, logs }) {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 w-full ${
+      className={`fixed bottom-0 left-0 w-full z-10 ${
         isOpen ? 'h-40' : 'h-10'
       } bg-gray-200 dark:bg-gray-800 transition-height duration-300 z-50`}
     >
